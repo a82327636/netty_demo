@@ -14,7 +14,7 @@ public class AuthOperation extends Operation {
 
     @Override
     public AuthOperationResult execute() {
-        if("admin".equalsIgnoreCase(this.userName)){
+        if ("admin".equalsIgnoreCase(this.userName)) {
             AuthOperationResult orderResponse = new AuthOperationResult(true);
             return orderResponse;
         }

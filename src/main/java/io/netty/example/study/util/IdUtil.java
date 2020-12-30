@@ -6,11 +6,11 @@ public final class IdUtil {
 
     private static final AtomicLong IDX = new AtomicLong();
 
-    private IdUtil(){
+    private IdUtil() {
         //no instance
     }
 
-    public static long nextId(){
+    public static long nextId() {
         return IDX.incrementAndGet();
     }
 

@@ -9,7 +9,7 @@ import lombok.extern.java.Log;
 @Log
 public class KeepaliveOperation extends Operation {
 
-    private long time ;
+    private long time;
 
     public KeepaliveOperation() {
         this.time = System.nanoTime();

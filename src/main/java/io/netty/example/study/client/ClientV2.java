@@ -16,28 +16,45 @@ import io.netty.example.study.common.order.OrderOperation;
 import io.netty.example.study.util.IdUtil;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
+import io.netty.util.internal.UnstableApi;
 
+import javax.net.ssl.SSLException;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * This class hadn't add auth or do other improvements. so need to refer {@link ClientV0}
+ */
+@UnstableApi
 public class ClientV2 {
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException, SSLException {
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
 
         NioEventLoopGroup group = new NioEventLoopGroup();
+
         try{
             bootstrap.group(group);
+
             RequestPendingCenter requestPendingCenter = new RequestPendingCenter();
+
+            SslContextBuilder sslContextBuilder = SslContextBuilder.forClient();
+            sslContextBuilder.trustManager(InsecureTrustManagerFactory.INSTANCE);
+            SslContext sslContext = sslContextBuilder.build();
 
             bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ChannelPipeline pipeline = ch.pipeline();
+
+                    pipeline.addLast(sslContext.newHandler(ch.alloc()));
+
                     pipeline.addLast(new OrderFrameDecoder());
                     pipeline.addLast(new OrderFrameEncoder());
-
                     pipeline.addLast(new OrderProtocolEncoder());
                     pipeline.addLast(new OrderProtocolDecoder());
 
@@ -69,9 +86,11 @@ public class ClientV2 {
             System.out.println(operationResult);
 
             channelFuture.channel().closeFuture().sync();
-        } finally {
+
+        } finally{
             group.shutdownGracefully();
         }
+
     }
 
 }

@@ -1,11 +1,11 @@
 package io.netty.example.study.common;
 
-import io.netty.example.study.common.order.OrderOperation;
-import io.netty.example.study.common.order.OrderOperationResult;
 import io.netty.example.study.common.auth.AuthOperation;
 import io.netty.example.study.common.auth.AuthOperationResult;
 import io.netty.example.study.common.keepalive.KeepaliveOperation;
 import io.netty.example.study.common.keepalive.KeepaliveOperationResult;
+import io.netty.example.study.common.order.OrderOperation;
+import io.netty.example.study.common.order.OrderOperationResult;
 
 import java.util.function.Predicate;
 
@@ -25,7 +25,26 @@ public enum OperationType {
         this.operationResultClazz = responseClass;
     }
 
-    public int getOpCode(){
+    public static OperationType fromOpCode(int type) {
+        return getOperationType(requestType -> requestType.opCode == type);
+    }
+
+    public static OperationType fromOperation(Operation operation) {
+        return getOperationType(requestType -> requestType.operationClazz == operation.getClass());
+    }
+
+    private static OperationType getOperationType(Predicate<OperationType> predicate) {
+        OperationType[] values = values();
+        for (OperationType operationType : values) {
+            if (predicate.test(operationType)) {
+                return operationType;
+            }
+        }
+
+        throw new AssertionError("no found type");
+    }
+
+    public int getOpCode() {
         return opCode;
     }
 
@@ -35,25 +54,6 @@ public enum OperationType {
 
     public Class<? extends OperationResult> getOperationResultClazz() {
         return operationResultClazz;
-    }
-
-    public static OperationType fromOpCode(int type){
-        return getOperationType(requestType -> requestType.opCode == type);
-    }
-
-    public static OperationType fromOperation(Operation operation){
-        return getOperationType(requestType -> requestType.operationClazz == operation.getClass());
-    }
-
-    private static OperationType getOperationType(Predicate<OperationType> predicate){
-        OperationType[] values = values();
-        for (OperationType operationType : values) {
-            if(predicate.test(operationType)){
-                return operationType;
-            }
-        }
-
-        throw new AssertionError("no found type");
     }
 
 }

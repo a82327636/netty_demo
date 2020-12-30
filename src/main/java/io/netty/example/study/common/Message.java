@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.example.study.util.JsonUtil;
 import lombok.Data;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @Data
 public abstract class Message<T extends MessageBody> {
@@ -12,7 +12,7 @@ public abstract class Message<T extends MessageBody> {
     private MessageHeader messageHeader;
     private T messageBody;
 
-    public T getMessageBody(){
+    public T getMessageBody() {
         return messageBody;
     }
 
@@ -37,7 +37,7 @@ public abstract class Message<T extends MessageBody> {
         this.messageHeader = messageHeader;
 
         Class<T> bodyClazz = getMessageBodyDecodeClass(opCode);
-        T body = JsonUtil.fromJson(msg.toString(Charset.forName("UTF-8")), bodyClazz);
+        T body = JsonUtil.fromJson(msg.toString(StandardCharsets.UTF_8), bodyClazz);
         this.messageBody = body;
     }
 
